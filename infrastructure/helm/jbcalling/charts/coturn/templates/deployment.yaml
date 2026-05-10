@@ -6,6 +6,9 @@ metadata:
     {{- include "coturn.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  # hostNetwork + fixed ports không cho phép 2 pod chạy đồng thời trên cùng node
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       {{- include "coturn.selectorLabels" . | nindent 6 }}
