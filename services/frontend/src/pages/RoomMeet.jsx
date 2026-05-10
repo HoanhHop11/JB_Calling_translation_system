@@ -687,6 +687,7 @@ export default function RoomMeet() {
         participants={participants}
         username={username}
         connectionStates={connectionStates}
+        roomId={roomId}
       />
 
       <SettingsPanel

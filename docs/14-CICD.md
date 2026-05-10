@@ -40,12 +40,24 @@ Hệ thống CI/CD sử dụng **GitHub Actions** cho Continuous Integration (bu
 **Flow**:
 1. Detect which service(s) changed (`dorny/paths-filter`)
 2. Matrix build: chỉ build services có thay đổi
-3. Build multi-platform image (linux/amd64) với Docker Buildx
-4. Push to `ghcr.io/<owner>/jbcalling-<service>:<tag>`
-5. Scan image với Trivy
-6. (On main only) Auto-create PR to bump image tag in `values-prod.yaml`
+3. Build image linux/amd64 với Docker Buildx
+4. Push lên `docker.io/jackboun11/jbcalling-<service>:<tag>` (Docker Hub)
+5. Scan image với Trivy (informational, `continue-on-error`)
+6. (Chỉ trên `main`) Job `bump-helm-tag`: tự tạo PR cập nhật `image.tag` trong `values-prod.yaml`
 
-**Tags**: `sha-<short-sha>`, `latest` (on main only)
+**Tags**: `sha-<short-sha>`, `latest` (chỉ trên main)
+
+**Service → Helm key mapping** (chỉ bump tag cho services có trong Helm chart):
+| Service folder | Helm subchart key | Image |
+|----------------|-------------------|-------|
+| `frontend` | `frontend` | `jbcalling-frontend` |
+| `gateway` | `gateway` | `jbcalling-gateway` |
+| `coturn` | `coturn` | `jbcalling-coturn` |
+| `stt` | `stt` | `jbcalling-stt` |
+| `translation` | `translation` | `jbcalling-translation` |
+| `tts` | `tts` | `jbcalling-tts` |
+
+Các service khác (`api`, `mediasoup`, `signaling-hybrid`, `stt-sherpa`, `translation-vinai`, `tts-piper`) vẫn được build & push lên Docker Hub nhưng **không** auto-bump (do chưa có trong Helm chart hiện tại).
 
 ### 2. ci-helm.yml — Validate Helm Charts
 
@@ -101,8 +113,14 @@ Root Application (`app-of-apps.yaml`) tự động tạo tất cả Application 
 
 | Secret | Mô tả |
 |--------|-------|
-| `GITHUB_TOKEN` | Tự động có (ghcr.io login) |
+| `DOCKERHUB_USERNAME` | Username Docker Hub (`jackboun11`) |
+| `DOCKERHUB_TOKEN` | Personal Access Token Docker Hub (Read/Write/Delete) |
+| `GITHUB_TOKEN` | Tự động có; dùng cho `peter-evans/create-pull-request` |
 | `GCP_SA_KEY` | Service Account JSON cho Terraform (nếu cần plan trong CI) |
+
+> ⚠️ Để job `bump-helm-tag` tạo PR được, vào **Repo Settings → Actions → General → Workflow permissions**, bật:
+> - **Read and write permissions**
+> - **Allow GitHub Actions to create and approve pull requests**
 
 ## Quy trình Deploy Thực Tế
 

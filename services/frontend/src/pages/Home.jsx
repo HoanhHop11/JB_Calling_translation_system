@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useWebRTC } from '../contexts/WebRTCContext'
 import { 
   Video, 
@@ -8,17 +8,37 @@ import {
   Monitor, 
   Mic,
   Sparkles,
-  Info 
+  Info,
+  ScanLine
 } from 'lucide-react'
 import Logo from '../assets/JBCalling_Web_NoBg.svg'
+import QRScanner from '../components/common/QRScanner'
 
 export default function Home() {
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { createRoom } = useWebRTC()
   const [username, setUsername] = useState('')
   const [roomCode, setRoomCode] = useState('')
   const [isJoining, setIsJoining] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
+  const [showScanner, setShowScanner] = useState(false)
+
+  // Khi mở Home với query ?join=room_xxx (do người khác scan QR share),
+  // tự prefill mã phòng và chuyển sang form Join.
+  useEffect(() => {
+    const joinId = searchParams.get('join')
+    if (joinId) {
+      setRoomCode(joinId)
+      setIsJoining(true)
+      const savedName = localStorage.getItem('jb_username') || ''
+      if (savedName) setUsername(savedName)
+      // Xoá query param khỏi URL cho gọn
+      const next = new URLSearchParams(searchParams)
+      next.delete('join')
+      setSearchParams(next, { replace: true })
+    }
+  }, [])
 
   const handleCreateRoom = async (e) => {
     e.preventDefault()
@@ -63,6 +83,12 @@ export default function Home() {
     navigate(`/room/${roomCode.trim()}`)
   }
 
+  const handleScanSuccess = ({ roomId, username: scannedUsername }) => {
+    localStorage.setItem('jb_username', scannedUsername)
+    setShowScanner(false)
+    navigate(`/room/${roomId}`)
+  }
+
   return (
     <div className="home-container">
       <div className="home-header">
@@ -100,6 +126,16 @@ export default function Home() {
               disabled={isCreating}
             >
               Đã có mã phòng? Tham gia ngay
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowScanner(true)}
+              className="home-scan-btn"
+              disabled={isCreating}
+            >
+              <ScanLine size={18} />
+              Quét mã QR để tham gia
             </button>
           </form>
         ) : (
@@ -144,7 +180,24 @@ export default function Home() {
             >
               Quay lại tạo phòng mới
             </button>
+
+            <button
+              type="button"
+              onClick={() => setShowScanner(true)}
+              className="home-scan-btn"
+            >
+              <ScanLine size={18} />
+              Quét mã QR để tham gia
+            </button>
           </form>
+        )}
+
+        {showScanner && (
+          <QRScanner
+            defaultUsername={username}
+            onClose={() => setShowScanner(false)}
+            onSubmit={handleScanSuccess}
+          />
         )}
 
         <div className="feature-card">

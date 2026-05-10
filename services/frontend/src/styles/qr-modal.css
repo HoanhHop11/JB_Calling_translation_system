@@ -1,0 +1,238 @@
+/* ============================================================================
+ * QR Modal - shared styles for QRShareModal and QRScanner
+ * ============================================================================ */
+
+.qr-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  animation: qr-fade-in 0.2s ease-out;
+}
+
+@keyframes qr-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.qr-modal {
+  position: relative;
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 16px;
+  padding: 32px 28px 24px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  animation: qr-slide-up 0.25s ease-out;
+}
+
+@keyframes qr-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.qr-modal__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  color: #64748b;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.qr-modal__close:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.qr-modal__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: #0f172a;
+}
+
+.qr-modal__subtitle {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0 0 20px 0;
+}
+
+.qr-modal__code {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+  padding: 8px;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  margin-bottom: 18px;
+}
+
+.qr-modal__roomid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 18px;
+}
+
+.qr-modal__label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.qr-modal__roomid-value {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.875rem;
+  background: #f1f5f9;
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: #1e293b;
+  word-break: break-all;
+}
+
+.qr-modal__roomid-inline {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  color: #1e293b;
+}
+
+.qr-modal__copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.qr-modal__copy-btn:hover {
+  background: #1e293b;
+}
+
+.qr-modal__copy-btn:active {
+  transform: scale(0.98);
+}
+
+.qr-modal__error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 0.85rem;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-top: 12px;
+  text-align: left;
+}
+
+.qr-modal__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+/* ============================================================================
+ * QR Scanner camera region
+ * ============================================================================ */
+.qr-modal--scanner .qr-scanner__region {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0f172a;
+}
+
+.qr-modal--scanner .qr-scanner__region video {
+  width: 100% !important;
+  height: auto !important;
+  display: block;
+}
+
+/* ============================================================================
+ * Home page: scan QR button
+ * ============================================================================ */
+.home-scan-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  margin-top: 8px;
+  background: #f8fafc;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.home-scan-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+/* ============================================================================
+ * Room: share QR button (next to copy room code)
+ * ============================================================================ */
+.room__share-qr-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 10px;
+  margin-left: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background-color 0.2s;
+}
+
+.room__share-qr-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}

@@ -1,8 +1,9 @@
 import { useRef, useEffect, useState } from 'react';
-import { VideoOff, MicOff, Monitor, Users, Mic, Copy } from 'lucide-react';
+import { VideoOff, MicOff, Monitor, Users, Mic, Copy, QrCode } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
 import useAudioLevel from '../../hooks/useAudioLevel';
 import StreamLoader from './StreamLoader';
+import QRShareModal from '../common/QRShareModal';
 
 /**
  * VideoGrid Component - Displays local and remote video streams
@@ -26,6 +27,7 @@ export default function VideoGrid({
   
   // Track stream loading states
   const [streamLoadingStates, setStreamLoadingStates] = useState(new Map());
+  const [showQRShare, setShowQRShare] = useState(false);
   
   // Detect local speaking
   const isLocalSpeaking = useAudioLevel(localStream, -50);
@@ -192,10 +194,22 @@ export default function VideoGrid({
                   <Copy size={16} />
                   Copy
                 </button>
+                <button
+                  className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-sm rounded transition-colors flex items-center gap-2"
+                  onClick={() => setShowQRShare(true)}
+                  title="Chia sẻ QR code"
+                >
+                  <QrCode size={16} />
+                  QR
+                </button>
               </div>
             </div>
           </div>
         </div>
+      )}
+
+      {showQRShare && (
+        <QRShareModal roomId={roomId} onClose={() => setShowQRShare(false)} />
       )}
     </div>
   );

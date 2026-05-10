@@ -307,6 +307,30 @@ async def transcribe_audio(
 - Monitoring alerts
 - Rolling updates
 
+### 3. CI/CD Secrets & Registry
+
+**Container Registry**: Docker Hub (`docker.io/jackboun11/jbcalling-<service>`)
+- Đồng bộ với `infrastructure/helm/jbcalling/values.yaml` (`global.imageRegistry: docker.io`).
+- KHÔNG dùng `ghcr.io` (đã từng cấu hình nhưng đã chuyển sang Docker Hub).
+
+**GitHub Actions Secrets cần có** (Settings → Secrets and variables → Actions):
+| Secret | Mục đích |
+|--------|----------|
+| `DOCKERHUB_USERNAME` | Username Docker Hub (`jackboun11`) |
+| `DOCKERHUB_TOKEN` | Personal Access Token Docker Hub (Read/Write/Delete) |
+| `GITHUB_TOKEN` | Tự động sẵn có, dùng cho auto-PR bump tag |
+
+**Quy ước với secret**:
+- Token thực tế lưu cục bộ trong `.env` (đã gitignore qua `*.env` và `.env`).
+- KHÔNG ghi giá trị token vào bất kỳ file nào trong repo (kể cả docs).
+- Khi token bị lộ trong chat/log, **revoke ngay** trên Docker Hub Security và tạo PAT mới.
+
+**Quy trình bump image tag**:
+1. Push code lên `main` (paths `services/**`).
+2. Workflow `ci-services.yml` build + push image lên Docker Hub với tag `sha-<short-sha>` và `latest`.
+3. Workflow tự tạo PR `chore/bump-<service>-<sha>` cập nhật `image.tag` trong `values-prod.yaml`.
+4. Review + merge PR → Argo CD `jbcalling-prod` (manual sync) → đồng bộ lên cluster.
+
 ## Monitoring & Logging
 
 ### 1. Metrics cần track

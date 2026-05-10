@@ -1,13 +1,17 @@
-import React from 'react';
-import { X, User, Wifi, WifiOff } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, User, Wifi, WifiOff, QrCode } from 'lucide-react';
+import QRShareModal from '../common/QRShareModal';
 
 const ParticipantsPanel = ({
   isOpen,
   onClose,
   participants,
   username,
-  connectionStates
+  connectionStates,
+  roomId
 }) => {
+  const [showQRShare, setShowQRShare] = useState(false);
+
   if (!isOpen) return null;
 
   // Tạo danh sách participants bao gồm cả local user
@@ -131,10 +135,28 @@ const ParticipantsPanel = ({
         ))}
       </div>
 
+      {/* Invite via QR */}
+      {roomId && (
+        <div className="p-3 border-t border-gray-700">
+          <button
+            type="button"
+            onClick={() => setShowQRShare(true)}
+            className="w-full flex items-center justify-center gap-2 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors text-sm font-medium"
+          >
+            <QrCode size={18} />
+            Mời thêm bằng QR
+          </button>
+        </div>
+      )}
+
       {/* Footer */}
       <div className="p-4 border-t border-gray-700 text-center text-xs text-gray-500">
         <p>Tất cả người tham gia đều được mã hóa end-to-end</p>
       </div>
+
+      {showQRShare && (
+        <QRShareModal roomId={roomId} onClose={() => setShowQRShare(false)} />
+      )}
     </div>
   );
 };
