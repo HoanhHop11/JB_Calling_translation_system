@@ -5,9 +5,14 @@ metadata:
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
+  annotations:
+    # Tạm ngưng reconcile cho đến khi nâng chart và cấu hình GCP credentials xong.
+    # Bỏ annotation này khi sẵn sàng để Argo CD tiếp tục đồng bộ.
+    argocd.argoproj.io/sync-options: SkipReconcile=true
 spec:
   project: default
   sources:
+    # TODO: nâng chart lên 9.x để fix bitnami/kubectl image bị deprecate trên Docker Hub
     - repoURL: https://vmware-tanzu.github.io/helm-charts
       chart: velero
       targetRevision: 8.1.0
@@ -20,9 +25,7 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: velero
+  # syncPolicy chuyển sang manual: không tự apply cho đến khi remove SkipReconcile
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
     syncOptions:
       - CreateNamespace=true
