@@ -1,5 +1,5 @@
 global:
-  imageRegistry: ghcr.io
+  imageRegistry: docker.io
   imagePullPolicy: IfNotPresent
   domain: jbcalling.site
 
@@ -8,7 +8,7 @@ gateway:
     tag: "2.0.6-vad-tuned"
   env:
     ANNOUNCED_IP: ""
-    CORS_ORIGIN: "https://jbcalling.site,https://www.jbcalling.site"
+    CORS_ORIGIN: "https://jbcalling.site,https://www.jbcalling.site,https://webrtc.jbcalling.site"
   resources:
     limits:
       cpu: "2"
@@ -18,7 +18,8 @@ gateway:
       memory: 1Gi
   ingressRoute:
     enabled: true
-    host: jbcalling.site
+    # Gateway phục vụ traffic WebRTC qua webrtc.jbcalling.site (chuẩn DNS hiện tại)
+    host: webrtc.jbcalling.site
     entryPoints:
       - websecure
     tls:
@@ -35,6 +36,11 @@ coturn:
 
 frontend:
   replicaCount: 3
+  env:
+    REACT_APP_GATEWAY_URL: "https://webrtc.jbcalling.site"
+    REACT_APP_SIGNALING_URL: "wss://webrtc.jbcalling.site"
+    REACT_APP_TURN_SERVER: "turn:media.jbcalling.site:3478"
+    REACT_APP_STT_SERVICE_URL: "https://stt.jbcalling.site"
   resources:
     limits:
       cpu: 200m
@@ -112,7 +118,7 @@ redis:
       memory: 512Mi
   persistence:
     size: 5Gi
-    storageClass: standard
+    storageClass: local-path        # local-path-provisioner đã được cài
 
 redis-gateway:
   resources:
@@ -124,4 +130,4 @@ redis-gateway:
       memory: 256Mi
   persistence:
     size: 5Gi
-    storageClass: standard
+    storageClass: local-path

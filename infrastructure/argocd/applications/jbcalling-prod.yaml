@@ -12,10 +12,9 @@ spec:
     targetRevision: main
     path: infrastructure/helm/jbcalling
     helm:
-      # Đang ở phase 6 (parallel staging trên k8s.jbcalling.site).
-      # Khi cutover prod sang K8s, đổi sang values-prod.yaml.
+      # Đã cutover sang K8s — sử dụng các domain prod thật (jbcalling.site, www, stt, tts, translation, webrtc)
       valueFiles:
-        - values-staging-k8s.yaml
+        - values-prod.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: jbcalling
