@@ -52,6 +52,8 @@
     kubectl taint nodes {{ ansible_hostname }}
     node-role.kubernetes.io/control-plane:NoSchedule-
   become: false
+  environment:
+    KUBECONFIG: "/home/{{ ansible_user }}/.kube/config"
   register: taint_result
   changed_when: "'untainted' in taint_result.stdout"
   failed_when:
@@ -63,6 +65,8 @@
     kubectl label nodes {{ ansible_hostname }}
     instance={{ instance_label }} --overwrite
   become: false
+  environment:
+    KUBECONFIG: "/home/{{ ansible_user }}/.kube/config"
   changed_when: true
 
 # ── Generate join command for workers ───────────────────────────────
