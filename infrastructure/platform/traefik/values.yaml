@@ -29,8 +29,9 @@ providers:
     allowCrossNamespace: true
 
 # certResolvers via additionalArguments (schema-safe for Traefik chart v34+)
+# TODO: sau khi có domain thật, thêm email vào đây và helm upgrade
 additionalArguments:
-  - "--certificatesresolvers.letsencrypt.acme.email="  # TODO: set your email
+  - "--certificatesresolvers.letsencrypt.acme.email=vonguyenhoanhhop9a42003@gmail.com"
   - "--certificatesresolvers.letsencrypt.acme.storage=/data/acme.json"
   - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
 
