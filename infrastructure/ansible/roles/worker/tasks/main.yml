@@ -22,4 +22,6 @@
     instance={{ instance_label }} --overwrite
   delegate_to: "{{ groups['control_plane'][0] }}"
   become: false
+  environment:
+    KUBECONFIG: "/home/{{ hostvars[groups['control_plane'][0]]['ansible_user'] }}/.kube/config"
   changed_when: true
