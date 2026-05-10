@@ -89,10 +89,18 @@
     state: directory
     mode: "0755"
 
-- name: Generate default containerd config
+# Force regenerate config mỗi lần để tránh config cũ/corrupt
+- name: Generate default containerd config (force overwrite)
   ansible.builtin.shell: containerd config default > /etc/containerd/config.toml
-  args:
-    creates: /etc/containerd/config.toml
+  changed_when: true
+  notify: Restart containerd
+
+- name: Ensure CRI plugin is not disabled in containerd
+  ansible.builtin.lineinfile:
+    path: /etc/containerd/config.toml
+    regexp: '^\s*disabled_plugins\s*='
+    line: 'disabled_plugins = []'
+  notify: Restart containerd
 
 - name: Enable SystemdCgroup in containerd
   ansible.builtin.lineinfile:
