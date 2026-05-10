@@ -28,6 +28,11 @@ ports:
     hostPort: 443
     exposedPort: 443
     protocol: TCP
+  # Đổi metrics sang 9101 để tránh conflict với node-exporter (9100) khi hostNetwork
+  metrics:
+    port: 9101
+    exposedPort: 9101
+    protocol: TCP
 
 providers:
   kubernetesIngress:
@@ -53,6 +58,8 @@ persistence:
 metrics:
   prometheus:
     entryPoint: metrics
+    service:
+      enabled: true
     addEntryPointsLabels: true
     addRoutersLabels: true
     addServicesLabels: true

@@ -1,3 +1,12 @@
+# Bitnami DockerHub deprecated their public images (Aug 2025) — override to rancher/kubectl
+kubectl:
+  image:
+    repository: rancher/kubectl
+    tag: v1.31.0
+
+# Tạm tắt upgradeCRDs job vì CRDs đã được Argo CD quản lý
+upgradeCRDs: false
+
 initContainers:
   - name: velero-plugin-for-gcp
     image: velero/velero-plugin-for-gcp:v1.11.0
@@ -46,5 +55,5 @@ resources:
 
 metrics:
   serviceMonitor:
-    enabled: true
-    namespace: monitoring
+    # Bật sau khi kube-prometheus-stack ổn định, namespace Velero bằng namespace Velero
+    enabled: false
