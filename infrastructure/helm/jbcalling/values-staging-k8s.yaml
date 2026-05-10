@@ -1,0 +1,136 @@
+# ============================================================================
+# Values cho phase staging/smoke-test trên K8s, chạy song song với prod cũ.
+# Tất cả service dùng subdomain *.k8s.jbcalling.site
+# Sau khi smoke test pass và DNS prod được cutover sang K8s, dùng values-prod.yaml.
+# ============================================================================
+global:
+  imageRegistry: docker.io       # tạm dùng images Docker Hub có sẵn từ Swarm cũ
+  imagePullPolicy: IfNotPresent
+  domain: k8s.jbcalling.site
+
+gateway:
+  image:
+    tag: "2.0.6-vad-tuned"
+  env:
+    ANNOUNCED_IP: ""             # Pod chạy hostNetwork → kubelet sẽ dùng nodeIP
+    CORS_ORIGIN: "https://k8s.jbcalling.site,https://app.k8s.jbcalling.site"
+  resources:
+    limits:
+      cpu: "2"
+      memory: 2Gi
+    requests:
+      cpu: 750m
+      memory: 1Gi
+  ingressRoute:
+    enabled: true
+    host: k8s.jbcalling.site
+    entryPoints:
+      - websecure
+    tls:
+      certResolver: letsencrypt
+
+coturn:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+frontend:
+  replicaCount: 3
+  env:
+    REACT_APP_GATEWAY_URL: "https://k8s.jbcalling.site"
+    REACT_APP_SIGNALING_URL: "wss://k8s.jbcalling.site"
+    REACT_APP_TURN_SERVER: "turn:turn.k8s.jbcalling.site:3478"
+    REACT_APP_STT_SERVICE_URL: "https://stt.k8s.jbcalling.site"
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  ingressRoute:
+    enabled: true
+    hosts:
+      - app.k8s.jbcalling.site
+    entryPoints:
+      - websecure
+    tls:
+      certResolver: letsencrypt
+
+stt:
+  resources:
+    limits:
+      cpu: "2"
+      memory: 4Gi
+    requests:
+      cpu: "1"
+      memory: 2560Mi
+  ingressRoute:
+    enabled: true
+    host: stt.k8s.jbcalling.site
+    entryPoints:
+      - websecure
+    tls:
+      certResolver: letsencrypt
+
+translation:
+  resources:
+    limits:
+      cpu: 1500m
+      memory: 2Gi
+    requests:
+      cpu: 750m
+      memory: 1Gi
+  ingressRoute:
+    enabled: true
+    host: translation.k8s.jbcalling.site
+    entryPoints:
+      - websecure
+    tls:
+      certResolver: letsencrypt
+
+tts:
+  nodeSelector:
+    instance: translation02
+  resources:
+    limits:
+      cpu: 1500m
+      memory: 2Gi
+    requests:
+      cpu: 750m
+      memory: 1Gi
+  ingressRoute:
+    enabled: true
+    host: tts.k8s.jbcalling.site
+    entryPoints:
+      - websecure
+    tls:
+      certResolver: letsencrypt
+
+redis:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 768Mi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  persistence:
+    size: 5Gi
+    storageClass: local-path     # local-path-provisioner đã được cài
+
+redis-gateway:
+  resources:
+    limits:
+      cpu: 250m
+      memory: 384Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  persistence:
+    size: 5Gi
+    storageClass: local-path

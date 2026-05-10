@@ -1,11 +1,11 @@
 global:
-  imageRegistry: ghcr.io
+  imageRegistry: docker.io
   imagePullPolicy: IfNotPresent
   domain: jbcalling.site
 
 gateway:
   image:
-    registry: ghcr.io
+    registry: docker.io
     repository: jackboun11/jbcalling-gateway
     tag: "2.0.6-vad-tuned"
   nodeSelector:
@@ -28,7 +28,7 @@ gateway:
 
 coturn:
   image:
-    registry: ghcr.io
+    registry: docker.io
     repository: jackboun11/jbcalling-coturn
     tag: "1.0.0"
   nodeSelector:
@@ -36,7 +36,7 @@ coturn:
 
 frontend:
   image:
-    registry: ghcr.io
+    registry: docker.io
     repository: jackboun11/jbcalling-frontend
     tag: "2.0.11-tts-lang-fix"
   replicaCount: 3
@@ -50,7 +50,7 @@ frontend:
 
 stt:
   image:
-    registry: ghcr.io
+    registry: docker.io
     repository: jackboun11/jbcalling-stt
     tag: "2.2.0-parakeet-tdt-0.6b"
   nodeSelector:
@@ -63,7 +63,7 @@ stt:
 
 translation:
   image:
-    registry: ghcr.io
+    registry: docker.io
     repository: jackboun11/jbcalling-translation-vinai
     tag: "1.0.3"
   nodeSelector:
@@ -80,7 +80,7 @@ translation:
 
 tts:
   image:
-    registry: ghcr.io
+    registry: docker.io
     repository: jackboun11/jbcalling-tts-piper
     tag: "2.0.1-cors"
   nodeSelector:
