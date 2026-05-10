@@ -1,0 +1,21 @@
+{{- if .Values.certificates.enabled }}
+{{- range $cert := .Values.certificates.list }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ $cert.name }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "jbcalling.labels" $ | nindent 4 }}
+spec:
+  secretName: {{ $cert.secretName }}
+  issuerRef:
+    name: {{ $.Values.certificates.issuerRef.name }}
+    kind: {{ $.Values.certificates.issuerRef.kind }}
+  dnsNames:
+    {{- range $cert.dnsNames }}
+    - {{ . | quote }}
+    {{- end }}
+{{- end }}
+{{- end }}

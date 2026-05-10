@@ -3,6 +3,39 @@ global:
   imagePullPolicy: IfNotPresent
   domain: jbcalling.site
 
+# ============================================================================
+# cert-manager Certificates: Let's Encrypt qua HTTP-01 challenge.
+# Mỗi Certificate sẽ tạo 1 Secret cùng tên trong namespace jbcalling.
+# IngressRoute bên dưới reference các Secret này qua tls.secretName.
+# ============================================================================
+certificates:
+  enabled: true
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  list:
+    - name: jbcalling-tls
+      secretName: jbcalling-tls
+      dnsNames:
+        - jbcalling.site
+        - www.jbcalling.site
+    - name: webrtc-tls
+      secretName: webrtc-tls
+      dnsNames:
+        - webrtc.jbcalling.site
+    - name: stt-tls
+      secretName: stt-tls
+      dnsNames:
+        - stt.jbcalling.site
+    - name: translation-tls
+      secretName: translation-tls
+      dnsNames:
+        - translation.jbcalling.site
+    - name: tts-tls
+      secretName: tts-tls
+      dnsNames:
+        - tts.jbcalling.site
+
 gateway:
   image:
     tag: "2.0.6-vad-tuned"
@@ -18,12 +51,11 @@ gateway:
       memory: 1Gi
   ingressRoute:
     enabled: true
-    # Gateway phục vụ traffic WebRTC qua webrtc.jbcalling.site (chuẩn DNS hiện tại)
     host: webrtc.jbcalling.site
     entryPoints:
       - websecure
     tls:
-      certResolver: letsencrypt
+      secretName: webrtc-tls
 
 coturn:
   resources:
@@ -56,7 +88,7 @@ frontend:
     entryPoints:
       - websecure
     tls:
-      certResolver: letsencrypt
+      secretName: jbcalling-tls
 
 stt:
   resources:
@@ -72,7 +104,7 @@ stt:
     entryPoints:
       - websecure
     tls:
-      certResolver: letsencrypt
+      secretName: stt-tls
 
 translation:
   resources:
@@ -88,7 +120,7 @@ translation:
     entryPoints:
       - websecure
     tls:
-      certResolver: letsencrypt
+      secretName: translation-tls
 
 tts:
   nodeSelector:
@@ -106,7 +138,7 @@ tts:
     entryPoints:
       - websecure
     tls:
-      certResolver: letsencrypt
+      secretName: tts-tls
 
 redis:
   resources:
@@ -118,7 +150,7 @@ redis:
       memory: 512Mi
   persistence:
     size: 5Gi
-    storageClass: local-path        # local-path-provisioner đã được cài
+    storageClass: local-path
 
 redis-gateway:
   resources:

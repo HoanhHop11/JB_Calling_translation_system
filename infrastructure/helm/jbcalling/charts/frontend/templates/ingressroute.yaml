@@ -18,6 +18,10 @@ spec:
     {{- end }}
   {{- if .Values.ingressRoute.tls }}
   tls:
+    {{- if .Values.ingressRoute.tls.secretName }}
+    secretName: {{ .Values.ingressRoute.tls.secretName }}
+    {{- else if .Values.ingressRoute.tls.certResolver }}
     certResolver: {{ .Values.ingressRoute.tls.certResolver }}
+    {{- end }}
   {{- end }}
 {{- end }}
