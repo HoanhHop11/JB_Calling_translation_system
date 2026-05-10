@@ -30,7 +30,7 @@ instances = {
     boot_disk = {
       image = "ubuntu-os-cloud/ubuntu-2204-lts"
       size  = 50
-      type  = "pd-ssd"
+      type  = "hyperdisk-balanced"  # c4d (AMD Turin) yêu cầu hyperdisk-balanced, không dùng pd-ssd
     }
     labels = {
       instance = "translation01"
