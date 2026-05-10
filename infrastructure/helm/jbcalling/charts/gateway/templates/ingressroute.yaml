@@ -9,12 +9,8 @@ spec:
   entryPoints:
     {{- toYaml .Values.ingressRoute.entryPoints | nindent 4 }}
   routes:
-    - match: Host(`{{ .Values.ingressRoute.host }}`) && PathPrefix(`/ws`)
-      kind: Rule
-      services:
-        - name: {{ include "gateway.fullname" . }}
-          port: {{ .Values.service.port }}
-    - match: Host(`{{ .Values.ingressRoute.host }}`) && PathPrefix(`/health`)
+    # Catch-all cho host gateway: bao gồm /socket.io (Socket.IO), /ws, /health, /api,...
+    - match: Host(`{{ .Values.ingressRoute.host }}`)
       kind: Rule
       services:
         - name: {{ include "gateway.fullname" . }}
