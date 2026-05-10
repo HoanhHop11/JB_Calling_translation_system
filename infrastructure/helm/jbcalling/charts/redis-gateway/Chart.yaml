@@ -1,0 +1,6 @@
+apiVersion: v2
+name: redis-gateway
+description: Redis instance for Gateway service (MediaSoup session/state)
+type: application
+version: 0.1.0
+appVersion: "7-alpine"

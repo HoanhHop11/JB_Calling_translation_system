@@ -1,0 +1,50 @@
+initContainers:
+  - name: velero-plugin-for-gcp
+    image: velero/velero-plugin-for-gcp:v1.11.0
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+
+configuration:
+  backupStorageLocation:
+    - name: default
+      provider: gcp
+      bucket: jbcalling-velero-backups
+      config:
+        serviceAccount: ""  # TODO: set GCP service account
+  volumeSnapshotLocation:
+    - name: default
+      provider: gcp
+      config:
+        project: ""  # TODO: set GCP project ID
+
+credentials:
+  useSecret: true
+  secretContents:
+    cloud: ""  # TODO: base64-encoded GCP service account key JSON
+
+schedules:
+  daily-backup:
+    disabled: false
+    schedule: "0 2 * * *"
+    template:
+      ttl: 720h0m0s  # 30 days
+      includedNamespaces:
+        - jbcalling
+      storageLocation: default
+      volumeSnapshotLocations:
+        - default
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+metrics:
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring

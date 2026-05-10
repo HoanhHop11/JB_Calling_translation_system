@@ -1,0 +1,61 @@
+replicaCount: 1
+
+image:
+  registry: ghcr.io
+  repository: jackboun11/jbcalling-tts-piper
+  tag: "2.0.1-cors"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 8004
+
+env:
+  PIPER_MODEL_VI: "/app/models/vi/vi_VN-vivos-x_low.onnx"
+  PIPER_CONFIG_VI: "/app/models/vi/vi_VN-vivos-x_low.onnx.json"
+  PIPER_MODEL_EN: "/app/models/en/en_US-lessac-medium.onnx"
+  PIPER_CONFIG_EN: "/app/models/en/en_US-lessac-medium.onnx.json"
+
+secretEnv: {}
+
+resources:
+  limits:
+    cpu: 1500m
+    memory: 2Gi
+  requests:
+    cpu: 750m
+    memory: 1Gi
+
+nodeSelector:
+  instance: translation02
+
+tolerations: []
+affinity: {}
+
+ingressRoute:
+  enabled: false
+  host: tts.jbcalling.site
+  entryPoints:
+    - websecure
+  tls:
+    certResolver: letsencrypt
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8004
+  initialDelaySeconds: 15
+  periodSeconds: 30
+  timeoutSeconds: 5
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8004
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5

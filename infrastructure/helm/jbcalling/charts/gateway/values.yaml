@@ -1,0 +1,75 @@
+replicaCount: 1
+
+image:
+  registry: ghcr.io
+  repository: jackboun11/jbcalling-gateway
+  tag: "2.0.6-vad-tuned"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+hostNetwork: true
+dnsPolicy: ClusterFirstWithHostNet
+
+service:
+  type: ClusterIP
+  port: 3000
+
+env:
+  PORT: "3000"
+  HOST: "0.0.0.0"
+  ANNOUNCED_IP: ""
+  WORKER_COUNT: "2"
+  RTC_MIN_PORT: "40000"
+  RTC_MAX_PORT: "40019"
+  REDIS_HOST: "jbcalling-redis-gateway"
+  STT_SERVICE_URL: "http://jbcalling-stt:8002"
+  TRANSLATION_SERVICE_URL: "http://jbcalling-translation:8005"
+  TTS_SERVICE_URL: "http://jbcalling-tts:8004"
+  CORS_ORIGIN: "*"
+  NODE_ENV: "production"
+  ENABLE_AUDIO_PROCESSING: "true"
+  AUDIO_SAMPLE_RATE: "48000"
+  AUDIO_CHANNELS: "1"
+
+secretEnv: {}
+
+resources:
+  limits:
+    cpu: "2"
+    memory: 2Gi
+  requests:
+    cpu: 750m
+    memory: 1Gi
+
+nodeSelector:
+  instance: translation01
+
+tolerations: []
+affinity: {}
+
+ingressRoute:
+  enabled: false
+  host: ""
+  entryPoints:
+    - websecure
+  tls:
+    certResolver: letsencrypt
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 3000
+  initialDelaySeconds: 15
+  periodSeconds: 30
+  timeoutSeconds: 5
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 3000
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5

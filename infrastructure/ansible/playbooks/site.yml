@@ -1,0 +1,28 @@
+---
+# Master playbook – provisions a kubeadm Kubernetes cluster
+# Usage: ansible-playbook playbooks/site.yml
+
+- name: Install prerequisites on all Kubernetes nodes
+  hosts: kube_cluster
+  become: true
+  roles:
+    - kubeadm-prereqs
+
+- name: Initialise Kubernetes control-plane
+  hosts: control_plane
+  become: true
+  roles:
+    - control-plane
+
+- name: Install Calico CNI
+  hosts: control_plane
+  become: false
+  roles:
+    - calico
+
+- name: Join worker nodes to the cluster
+  hosts: workers
+  become: true
+  serial: 1
+  roles:
+    - worker

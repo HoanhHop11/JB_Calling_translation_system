@@ -1,0 +1,127 @@
+global:
+  imageRegistry: ghcr.io
+  imagePullPolicy: IfNotPresent
+  domain: jbcalling.site
+
+gateway:
+  image:
+    tag: "2.0.6-vad-tuned"
+  env:
+    ANNOUNCED_IP: ""
+    CORS_ORIGIN: "https://jbcalling.site,https://www.jbcalling.site"
+  resources:
+    limits:
+      cpu: "2"
+      memory: 2Gi
+    requests:
+      cpu: 750m
+      memory: 1Gi
+  ingressRoute:
+    enabled: true
+    host: jbcalling.site
+    entryPoints:
+      - websecure
+    tls:
+      certResolver: letsencrypt
+
+coturn:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+frontend:
+  replicaCount: 3
+  resources:
+    limits:
+      cpu: 200m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+  ingressRoute:
+    enabled: true
+    hosts:
+      - jbcalling.site
+      - www.jbcalling.site
+    entryPoints:
+      - websecure
+    tls:
+      certResolver: letsencrypt
+
+stt:
+  resources:
+    limits:
+      cpu: "2"
+      memory: 4Gi
+    requests:
+      cpu: "1"
+      memory: 2560Mi
+  ingressRoute:
+    enabled: true
+    host: stt.jbcalling.site
+    entryPoints:
+      - websecure
+    tls:
+      certResolver: letsencrypt
+
+translation:
+  resources:
+    limits:
+      cpu: 1500m
+      memory: 2Gi
+    requests:
+      cpu: 750m
+      memory: 1Gi
+  ingressRoute:
+    enabled: true
+    host: translation.jbcalling.site
+    entryPoints:
+      - websecure
+    tls:
+      certResolver: letsencrypt
+
+tts:
+  nodeSelector:
+    instance: translation02
+  resources:
+    limits:
+      cpu: 1500m
+      memory: 2Gi
+    requests:
+      cpu: 750m
+      memory: 1Gi
+  ingressRoute:
+    enabled: true
+    host: tts.jbcalling.site
+    entryPoints:
+      - websecure
+    tls:
+      certResolver: letsencrypt
+
+redis:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 768Mi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  persistence:
+    size: 5Gi
+    storageClass: standard
+
+redis-gateway:
+  resources:
+    limits:
+      cpu: 250m
+      memory: 384Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+  persistence:
+    size: 5Gi
+    storageClass: standard

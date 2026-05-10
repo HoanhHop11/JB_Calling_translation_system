@@ -1,0 +1,118 @@
+global:
+  imageRegistry: ghcr.io
+  imagePullPolicy: IfNotPresent
+  domain: jbcalling.site
+
+gateway:
+  image:
+    registry: ghcr.io
+    repository: jackboun11/jbcalling-gateway
+    tag: "2.0.6-vad-tuned"
+  nodeSelector:
+    instance: translation01
+  env:
+    PORT: "3000"
+    HOST: "0.0.0.0"
+    WORKER_COUNT: "2"
+    RTC_MIN_PORT: "40000"
+    RTC_MAX_PORT: "40019"
+    NODE_ENV: "production"
+    ENABLE_AUDIO_PROCESSING: "true"
+    AUDIO_SAMPLE_RATE: "48000"
+    AUDIO_CHANNELS: "1"
+    REDIS_HOST: "jbcalling-redis-gateway"
+    STT_SERVICE_URL: "http://jbcalling-stt:8002"
+    TRANSLATION_SERVICE_URL: "http://jbcalling-translation:8005"
+    TTS_SERVICE_URL: "http://jbcalling-tts:8004"
+    CORS_ORIGIN: "*"
+
+coturn:
+  image:
+    registry: ghcr.io
+    repository: jackboun11/jbcalling-coturn
+    tag: "1.0.0"
+  nodeSelector:
+    instance: translation02
+
+frontend:
+  image:
+    registry: ghcr.io
+    repository: jackboun11/jbcalling-frontend
+    tag: "2.0.11-tts-lang-fix"
+  replicaCount: 3
+  nodeSelector:
+    instance: translation01
+  env:
+    REACT_APP_GATEWAY_URL: "https://jbcalling.site"
+    REACT_APP_SIGNALING_URL: "wss://jbcalling.site"
+    REACT_APP_TURN_SERVER: "turn:turn.jbcalling.site:3478"
+    REACT_APP_STT_SERVICE_URL: "https://stt.jbcalling.site"
+
+stt:
+  image:
+    registry: ghcr.io
+    repository: jackboun11/jbcalling-stt
+    tag: "2.2.0-parakeet-tdt-0.6b"
+  nodeSelector:
+    instance: translation02
+  env:
+    REDIS_HOST: "jbcalling-redis"
+    REDIS_PORT: "6379"
+    REDIS_TTL: "3600"
+    CORS_ORIGINS: "*"
+
+translation:
+  image:
+    registry: ghcr.io
+    repository: jackboun11/jbcalling-translation-vinai
+    tag: "1.0.3"
+  nodeSelector:
+    instance: translation02
+  env:
+    REDIS_HOST: "jbcalling-redis"
+    REDIS_PORT: "6379"
+    REDIS_DB: "0"
+    CACHE_TTL: "3600"
+    DEVICE: "cpu"
+    COMPUTE_TYPE: "int8"
+    MAX_LENGTH: "512"
+    BEAM_SIZE: "5"
+
+tts:
+  image:
+    registry: ghcr.io
+    repository: jackboun11/jbcalling-tts-piper
+    tag: "2.0.1-cors"
+  nodeSelector:
+    instance: translation02
+  env:
+    PIPER_MODEL_VI: "/app/models/vi/vi_VN-vivos-x_low.onnx"
+    PIPER_CONFIG_VI: "/app/models/vi/vi_VN-vivos-x_low.onnx.json"
+    PIPER_MODEL_EN: "/app/models/en/en_US-lessac-medium.onnx"
+    PIPER_CONFIG_EN: "/app/models/en/en_US-lessac-medium.onnx.json"
+
+redis:
+  image:
+    registry: docker.io
+    repository: redis
+    tag: "7-alpine"
+  nodeSelector:
+    instance: translation01
+  persistence:
+    size: 5Gi
+  config:
+    maxmemory: "512mb"
+    maxmemoryPolicy: "allkeys-lru"
+
+redis-gateway:
+  image:
+    registry: docker.io
+    repository: redis
+    tag: "7-alpine"
+  nodeSelector:
+    instance: translation02
+  persistence:
+    size: 5Gi
+  config:
+    maxmemory: "256mb"
+    maxmemoryPolicy: "allkeys-lru"

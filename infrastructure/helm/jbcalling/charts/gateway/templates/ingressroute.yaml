@@ -1,0 +1,26 @@
+{{- if .Values.ingressRoute.enabled }}
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ include "gateway.fullname" . }}
+  labels:
+    {{- include "gateway.labels" . | nindent 4 }}
+spec:
+  entryPoints:
+    {{- toYaml .Values.ingressRoute.entryPoints | nindent 4 }}
+  routes:
+    - match: Host(`{{ .Values.ingressRoute.host }}`) && PathPrefix(`/ws`)
+      kind: Rule
+      services:
+        - name: {{ include "gateway.fullname" . }}
+          port: {{ .Values.service.port }}
+    - match: Host(`{{ .Values.ingressRoute.host }}`) && PathPrefix(`/health`)
+      kind: Rule
+      services:
+        - name: {{ include "gateway.fullname" . }}
+          port: {{ .Values.service.port }}
+  {{- if .Values.ingressRoute.tls }}
+  tls:
+    certResolver: {{ .Values.ingressRoute.tls.certResolver }}
+  {{- end }}
+{{- end }}

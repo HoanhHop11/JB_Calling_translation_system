@@ -1,0 +1,61 @@
+replicaCount: 1
+
+image:
+  registry: ghcr.io
+  repository: jackboun11/jbcalling-stt
+  tag: "2.2.0-parakeet-tdt-0.6b"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 8002
+
+env:
+  REDIS_HOST: "jbcalling-redis"
+  REDIS_PORT: "6379"
+  REDIS_TTL: "3600"
+  CORS_ORIGINS: "*"
+
+secretEnv: {}
+
+resources:
+  limits:
+    cpu: "2"
+    memory: 4Gi
+  requests:
+    cpu: "1"
+    memory: 2560Mi
+
+nodeSelector:
+  instance: translation02
+
+tolerations: []
+affinity: {}
+
+ingressRoute:
+  enabled: false
+  host: stt.jbcalling.site
+  entryPoints:
+    - websecure
+  tls:
+    certResolver: letsencrypt
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8002
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  timeoutSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8002
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 10

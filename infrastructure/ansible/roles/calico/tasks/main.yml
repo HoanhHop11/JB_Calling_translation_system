@@ -1,0 +1,21 @@
+---
+- name: Download Calico manifest
+  ansible.builtin.get_url:
+    url: "{{ calico_manifest_url }}"
+    dest: /tmp/calico.yaml
+    mode: "0644"
+
+- name: Apply Calico CNI manifest
+  ansible.builtin.command: kubectl apply -f /tmp/calico.yaml
+  register: calico_apply
+  changed_when: "'created' in calico_apply.stdout or 'configured' in calico_apply.stdout"
+
+- name: Wait for Calico pods to be ready
+  ansible.builtin.shell: |
+    kubectl -n kube-system get pods -l k8s-app=calico-node \
+      -o jsonpath='{.items[*].status.phase}' | tr ' ' '\n' | sort -u
+  register: calico_status
+  until: calico_status.stdout == "Running"
+  retries: 30
+  delay: 10
+  changed_when: false

@@ -1,0 +1,65 @@
+replicaCount: 1
+
+image:
+  registry: ghcr.io
+  repository: jackboun11/jbcalling-translation-vinai
+  tag: "1.0.3"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 8005
+
+env:
+  REDIS_HOST: "jbcalling-redis"
+  REDIS_PORT: "6379"
+  REDIS_DB: "0"
+  CACHE_TTL: "3600"
+  DEVICE: "cpu"
+  COMPUTE_TYPE: "int8"
+  MAX_LENGTH: "512"
+  BEAM_SIZE: "5"
+
+secretEnv: {}
+
+resources:
+  limits:
+    cpu: 1500m
+    memory: 2Gi
+  requests:
+    cpu: 750m
+    memory: 1Gi
+
+nodeSelector:
+  instance: translation02
+
+tolerations: []
+affinity: {}
+
+ingressRoute:
+  enabled: false
+  host: translation.jbcalling.site
+  entryPoints:
+    - websecure
+  tls:
+    certResolver: letsencrypt
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8005
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  timeoutSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8005
+  initialDelaySeconds: 20
+  periodSeconds: 10
+  timeoutSeconds: 10

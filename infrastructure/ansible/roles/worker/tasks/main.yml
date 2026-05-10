@@ -1,0 +1,25 @@
+---
+- name: Check if node already joined the cluster
+  ansible.builtin.stat:
+    path: /etc/kubernetes/kubelet.conf
+  register: kubelet_conf
+
+- name: Join worker to the Kubernetes cluster
+  ansible.builtin.command: "{{ kubeadm_join_command }}"
+  when: not kubelet_conf.stat.exists
+  register: join_result
+  changed_when: join_result.rc == 0
+
+- name: Wait for kubelet to become ready
+  ansible.builtin.wait_for:
+    path: /etc/kubernetes/kubelet.conf
+    timeout: 60
+  when: not kubelet_conf.stat.exists
+
+- name: Label worker node with instance name
+  ansible.builtin.command: >-
+    kubectl label nodes {{ ansible_hostname }}
+    instance={{ instance_label }} --overwrite
+  delegate_to: "{{ groups['control_plane'][0] }}"
+  become: false
+  changed_when: true

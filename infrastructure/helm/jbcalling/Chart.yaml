@@ -1,0 +1,32 @@
+apiVersion: v2
+name: jbcalling
+description: JBCalling - Real-time Translation System Umbrella Chart
+type: application
+version: 0.1.0
+appVersion: "2.0.0"
+
+dependencies:
+  - name: gateway
+    version: 0.1.0
+    repository: file://charts/gateway
+  - name: coturn
+    version: 0.1.0
+    repository: file://charts/coturn
+  - name: frontend
+    version: 0.1.0
+    repository: file://charts/frontend
+  - name: stt
+    version: 0.1.0
+    repository: file://charts/stt
+  - name: translation
+    version: 0.1.0
+    repository: file://charts/translation
+  - name: tts
+    version: 0.1.0
+    repository: file://charts/tts
+  - name: redis
+    version: 0.1.0
+    repository: file://charts/redis
+  - name: redis-gateway
+    version: 0.1.0
+    repository: file://charts/redis-gateway

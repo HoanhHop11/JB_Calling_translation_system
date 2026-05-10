@@ -1,0 +1,65 @@
+deployment:
+  replicas: 1
+
+hostNetwork: true
+dnsPolicy: ClusterFirstWithHostNet
+
+nodeSelector:
+  kubernetes.io/hostname: translation01
+
+ports:
+  web:
+    port: 8000
+    hostPort: 80
+    exposedPort: 80
+    protocol: TCP
+  websecure:
+    port: 8443
+    hostPort: 443
+    exposedPort: 443
+    protocol: TCP
+    tls:
+      enabled: true
+
+providers:
+  kubernetesIngress:
+    enabled: true
+    publishedService:
+      enabled: true
+  kubernetesCRD:
+    enabled: true
+    allowCrossNamespace: true
+
+certResolvers:
+  letsencrypt:
+    email: ""  # TODO: set your email
+    tlsChallenge: true
+    httpChallenge:
+      entryPoint: web
+    storage: /data/acme.json
+
+persistence:
+  enabled: true
+  size: 128Mi
+  path: /data
+
+metrics:
+  prometheus:
+    entryPoint: metrics
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+
+logs:
+  general:
+    level: INFO
+  access:
+    enabled: true
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi

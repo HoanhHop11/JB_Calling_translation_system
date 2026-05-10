@@ -1,0 +1,6 @@
+apiVersion: v2
+name: coturn
+description: TURN/STUN server for WebRTC NAT traversal
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

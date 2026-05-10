@@ -1,0 +1,63 @@
+replicaCount: 3
+
+image:
+  registry: ghcr.io
+  repository: jackboun11/jbcalling-frontend
+  tag: "2.0.11-tts-lang-fix"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 80
+
+env:
+  REACT_APP_GATEWAY_URL: "https://jbcalling.site"
+  REACT_APP_SIGNALING_URL: "wss://jbcalling.site"
+  REACT_APP_TURN_SERVER: "turn:turn.jbcalling.site:3478"
+  REACT_APP_STT_SERVICE_URL: "https://stt.jbcalling.site"
+
+secretEnv: {}
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+nodeSelector:
+  instance: translation01
+
+tolerations: []
+affinity: {}
+
+ingressRoute:
+  enabled: false
+  hosts:
+    - jbcalling.site
+    - www.jbcalling.site
+  entryPoints:
+    - websecure
+  tls:
+    certResolver: letsencrypt
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: 80
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 5
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: 80
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5

@@ -1,0 +1,36 @@
+loki:
+  enabled: true
+  persistence:
+    enabled: true
+    size: 20Gi
+  config:
+    auth_enabled: false
+    table_manager:
+      retention_deletes_enabled: true
+      retention_period: 720h  # 30 days
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+promtail:
+  enabled: true
+  config:
+    clients:
+      - url: http://loki-stack:3100/loki/api/v1/push
+    snippets:
+      pipelineStages:
+        - cri: {}
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+grafana:
+  enabled: false  # using kube-prometheus-stack Grafana
