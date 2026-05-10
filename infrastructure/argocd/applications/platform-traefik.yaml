@@ -26,3 +26,5 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      # Replace thay vì strategic-merge-patch để tránh duplicate port khi đổi containerPort
+      - Replace=true
