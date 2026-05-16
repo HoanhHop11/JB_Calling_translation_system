@@ -32,8 +32,13 @@ ports:
 providers:
   kubernetesIngress:
     enabled: true
+    # ClusterIP không có EXTERNAL-IP → cert-manager chờ Ingress status có LB address → timeout HTTP-01
     publishedService:
-      enabled: true
+      enabled: false
+    # Đặt IP công khai của NODE chạy Traefik (hostNetwork). GCP: external IP của translation01 khi chỉ có 1 node ingress.
+    # Khi đổi máy/IP tĩnh, cập nhật và helm upgrade Traefik rồi xóa/reissue Certificate trong jbcalling nếu cần.
+    ingressEndpoint:
+      ip: "34.142.153.246"
   kubernetesCRD:
     enabled: true
     allowCrossNamespace: true
